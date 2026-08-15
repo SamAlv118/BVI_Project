@@ -66,6 +66,13 @@ for x in range(len(zeros)):
         if x+y < len(sine_wave):
             sine_wave[zeros[x] + y] = 0
 
+#---------------------CALCULATION TUTORIAL---------------------
+#To calculate wavelengths audibly, use a stopwatch beginning with the audio file, recording each stoppage time
+#example using 656 hydrogen line.
+#if you hear the audio stop at 4.5 seconds, you multiply this by the samplingrate to get the total number of frames that have passed since the beginning of the audio file
+#you then divide by 551 which is the number of sampling frames given to each pixel in the spectrum (220500 frames/400 pixels)
+#then add 300 to account for the fact that your number starts from 0 but the spectrum is actually shifted and starts at 300 nm
+#---------------------------------------------------------------
 
 one_channel = (sine_wave * 32767).astype(np.int16) #this converts each output from the sine wave into a 16-bit integer that can be read as audio
 
