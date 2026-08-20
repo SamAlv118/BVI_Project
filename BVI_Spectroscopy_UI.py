@@ -32,7 +32,7 @@ radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emissi
 radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorbtion")
 
 # Create text input
-text_label = tk.Label(root, text="Enter line wavelengths seperated by commas.")
+text_label = tk.Label(root, text="Enter line wavelengths between 300 and 700 (nanometers) seperated by commas.")
 text_entry = tk.Entry(root, width=25)
 
 # Create submit button
