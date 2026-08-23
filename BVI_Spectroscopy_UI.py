@@ -3,13 +3,18 @@ from tkinter import messagebox
 
 #Global variables for use in Spectrum_Creator.py
 exclusions = []
-stype = []
+stype = ''
 
 def submit():
+
+    global stype
 
     selected_option = radio_var.get()
     entered_text = text_entry.get()
     errors = []
+
+    #adding the spectrum type to global variable so spectrum creator knows what kind of spectrum to use
+    stype = selected_option
 
     #try and except to catch unwanted characters
     try:
@@ -33,9 +38,6 @@ def submit():
 
     except ValueError:
         errors.append("Please enter a valid wavelength (Or leave blank for no absorption/emission)")       
-
-    #adding the spectrum type to global variable so spectrum creator knows what kind of spectrum to use
-    stype.append(selected_option)
 
     
     if selected_option == '0':
