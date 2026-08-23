@@ -57,7 +57,6 @@ root = tk.Tk()
 root.title("Spectrum Builder")
 root.geometry("400x300")
 root.resizable(True, True)
-#root.aspect(2,1 2,1)
 
 radio_var = tk.StringVar(value=False)  #false makes it empty by default
 
