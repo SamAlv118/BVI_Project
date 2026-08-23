@@ -7,11 +7,12 @@ stype = ''
 
 def submit():
 
-    global stype, targs
+    global stype, targs, duration
 
     #without this clear line, we get duplicates of each target wavelength
     targs.clear()
 
+    duration = int(spinbox_var.get())
     selected_option = radio_var.get()
     entered_text = text_entry.get()
     errors = []
@@ -60,30 +61,43 @@ def CreateUI():
     #creating the UI window
     root = tk.Tk()
     root.title("Spectrum Builder")
-    root.geometry("400x300")
+    root.geometry("500x320")
     root.resizable(True, True)
+    global radio_var, text_entry, spinbox_var
 
-    global radio_var
+    t_frame = tk.Frame(root)
+    radio_frame = tk.Frame(t_frame)
+    spinbox_frame = tk.Frame(t_frame)
+
     radio_var = tk.StringVar(value=False)  #false makes it empty by default
 
-    radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emission", font = ("Arial", 13))
-    radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorption", font = ("Arial", 13))
+    radio1 = tk.Radiobutton(radio_frame, text="Emission", variable=radio_var, value="Emission", font = ("Arial", 13))
+    radio2 = tk.Radiobutton(radio_frame, text="Absorbtion", variable=radio_var, value="Absorption", font = ("Arial", 13))
+    radio1.pack
 
     text_label = tk.Label(root, text="Enter line wavelengths as integers seperated by commas.", font = ("Arial", 13))
-    global text_entry
     text_entry = tk.Entry(root, width=40, )
+
+    spinbox_label = tk.Label(spinbox_frame, text="Duration (sec)", font=("Arial", 13))
+    spinbox_var = tk.StringVar(value="5")
+    spinbox = tk.Spinbox(spinbox_frame, from_ = 5, to = 60, textvariable=spinbox_var, width=5)
 
     submit_btn = tk.Button(root, text="Submit", command=submit, font = ("Arial", 13))
 
     #moving widgets around to make the UI less cramped
-    radio1.pack(pady=10, expand=True)
-    radio2.pack(pady=10, expand=True)
-    text_label.pack(pady=(20, 0), expand=True)
-    text_entry.pack(pady=20, expand=True)
-    submit_btn.pack(pady=10, expand=True)
+    t_frame.pack(pady=15, expand=True)
+    radio1.pack(anchor='w', padx=10, expand=True)
+    radio2.pack(anchor='w', padx=10, expand=True)
+    spinbox_label.pack(side=tk.LEFT,padx=(10, 5), expand=True)
+    radio_frame.pack(side=tk.LEFT, padx=20, expand=True)
+    spinbox.pack(side=tk.LEFT,padx=5, expand=True)
+    spinbox_frame.pack(side=tk.LEFT, padx=20, expand=True)
+    text_label.pack(pady=(5, 20), expand=False)
+    text_entry.pack(pady=10, expand=False)
+    submit_btn.pack(pady=5, expand=True)
 
     #start the GUI event loop
     root.mainloop()
 
-    return stype, targs
+    return stype, targs, duration
 

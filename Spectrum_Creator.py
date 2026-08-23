@@ -111,11 +111,12 @@ def CreateSpec():
     global inc
     global pixel_color
     global width
+    global duration
 
     width = 400 #each pixel is 1 nm in the range 300-700 nm
     height = 100 #this is just to give the spectrum more depth
     img = []
-    stype, targs = CreateUI()
+    stype, targs, duration = CreateUI()
     pixel_color = ()
     
     for i in range(len(targs)):
