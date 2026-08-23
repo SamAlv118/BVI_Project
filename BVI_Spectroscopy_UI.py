@@ -2,12 +2,15 @@ import tkinter as tk
 from tkinter import messagebox
 
 #Global variables for use in Spectrum_Creator.py
-exclusions = []
+targs = []
 stype = ''
 
 def submit():
 
-    global stype
+    global stype, targs
+
+    #without this clear line, we get duplicates of each target wavelength
+    targs.clear()
 
     selected_option = radio_var.get()
     entered_text = text_entry.get()
@@ -30,14 +33,14 @@ def submit():
                 if int(e) > 700 or int(e) < 300:
                     errors.append("Only wavelengths between 300nm and 700nm are permitted.")
                 else:
-                    exclusions.append(int(e.strip()))
+                    targs.append(int(e.strip()))
 
         #this handles the case where only 1 wavelength is input 
         else:
-            exclusions.append(int(entered_text))
+            targs.append(int(entered_text))
 
     except ValueError:
-        errors.append("Please enter a valid wavelength (Or leave blank for no absorption/emission)")       
+        errors.append("Please enter a valid integer wavelength (Or leave blank for no absorption/emission)")       
 
     
     if selected_option == '0':
@@ -53,29 +56,34 @@ def submit():
     messagebox.showinfo("Submission Successful",
                         f"Selected Option: {selected_option}\nEntered Text: {entered_text}")
     
+def CreateUI():
+    #creating the UI window
+    root = tk.Tk()
+    root.title("Spectrum Builder")
+    root.geometry("400x300")
+    root.resizable(True, True)
 
-#creating the UI window
-root = tk.Tk()
-root.title("Spectrum Builder")
-root.geometry("400x300")
-root.resizable(True, True)
+    global radio_var
+    radio_var = tk.StringVar(value=False)  #false makes it empty by default
 
-radio_var = tk.StringVar(value=False)  #false makes it empty by default
+    radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emission", font = ("Arial", 13))
+    radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorption", font = ("Arial", 13))
 
-radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emission", font = ("Arial", 13))
-radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorption", font = ("Arial", 13))
+    text_label = tk.Label(root, text="Enter line wavelengths as integers seperated by commas.", font = ("Arial", 13))
+    global text_entry
+    text_entry = tk.Entry(root, width=40, )
 
-text_label = tk.Label(root, text="Enter line wavelengths seperated by commas.", font = ("Arial", 13))
-text_entry = tk.Entry(root, width=40, )
+    submit_btn = tk.Button(root, text="Submit", command=submit, font = ("Arial", 13))
 
-submit_btn = tk.Button(root, text="Submit", command=submit, font = ("Arial", 13))
+    #moving widgets around to make the UI less cramped
+    radio1.pack(pady=10, expand=True)
+    radio2.pack(pady=10, expand=True)
+    text_label.pack(pady=(20, 0), expand=True)
+    text_entry.pack(pady=20, expand=True)
+    submit_btn.pack(pady=10, expand=True)
 
-#moving widgets around to make the UI less cramped
-radio1.pack(pady=10, expand=True)
-radio2.pack(pady=10, expand=True)
-text_label.pack(pady=(20, 0), expand=True)
-text_entry.pack(pady=20, expand=True)
-submit_btn.pack(pady=10, expand=True)
+    #start the GUI event loop
+    root.mainloop()
 
-#start the GUI event loop
-root.mainloop()
+    return stype, targs
+
