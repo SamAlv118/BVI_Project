@@ -1,49 +1,80 @@
 import tkinter as tk
 from tkinter import messagebox
 
+#Global variables for use in Spectrum_Creator.py
+exclusions = []
+stype = []
+
 def submit():
-    """Handle submit button click."""
+
     selected_option = radio_var.get()
-    entered_text = text_entry.get().strip()
+    entered_text = text_entry.get()
+    errors = []
 
-    # Validation checks
-    if not selected_option:
-        messagebox.showwarning("Input Error", "Please select a spectrum type.")
-        return
-    if not entered_text:
-        messagebox.showwarning("Input Error", "Please enter some text.")
+    #try and except to catch unwanted characters
+    try:
+
+        #does not populate the global list with anything if no values are input
+        if entered_text == '':
+            entered_text = "None"
+
+        #add each wavelength to a global list to be used in the spectrum creator
+        elif len(entered_text) > 1:
+            colors = entered_text.split(",")
+            for e in colors:
+                if int(e) > 700 or int(e) < 300:
+                    errors.append("Only wavelengths between 300nm and 700nm are permitted.")
+                else:
+                    exclusions.append(int(e.strip()))
+
+        #this handles the case where only 1 wavelength is input 
+        else:
+            exclusions.append(int(entered_text))
+
+    except ValueError:
+        errors.append("Please enter a valid wavelength (Or leave blank for no absorption/emission)")       
+
+    #adding the spectrum type to global variable so spectrum creator knows what kind of spectrum to use
+    stype.append(selected_option)
+
+    
+    if selected_option == '0':
+        errors.append("Please select a spectrum type.")
+
+    #create a single warning box that compiles all errors instead of having to click through multiple boxes
+    if errors:
+        messagebox.showwarning("Input Error", "- " + "\n\n- ".join(errors))
         return
 
-    # Display the result
+
+    #display a confirmation screen on valid submission
     messagebox.showinfo("Submission Successful",
                         f"Selected Option: {selected_option}\nEntered Text: {entered_text}")
+    
 
-# Create main window
+#creating the UI window
 root = tk.Tk()
 root.title("Spectrum Builder")
-root.geometry("300x200")
-root.resizable(False, False)
+root.geometry("400x300")
+root.resizable(True, True)
+#root.aspect(2,1 2,1)
 
-# Variable to store selected radio button value
-radio_var = tk.StringVar(value=False)  # Empty by default
+radio_var = tk.StringVar(value=False)  #false makes it empty by default
 
-# Create radio buttons
-radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emission")
-radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorbtion")
+radio1 = tk.Radiobutton(root, text="Emission", variable=radio_var, value="Emission", font = ("Arial", 13))
+radio2 = tk.Radiobutton(root, text="Absorbtion", variable=radio_var, value="Absorption", font = ("Arial", 13))
 
-# Create text input
-text_label = tk.Label(root, text="Enter line wavelengths between 300 and 700 (nanometers) seperated by commas.")
-text_entry = tk.Entry(root, width=25)
+text_label = tk.Label(root, text="Enter line wavelengths seperated by commas.", font = ("Arial", 13))
+text_entry = tk.Entry(root, width=40, )
 
-# Create submit button
-submit_btn = tk.Button(root, text="Submit", command=submit)
+submit_btn = tk.Button(root, text="Submit", command=submit, font = ("Arial", 13))
 
-# Layout widgets
-radio1.pack(pady=5)
-radio2.pack(pady=5)
-text_label.pack(pady=(10, 0))
-text_entry.pack(pady=5)
-submit_btn.pack(pady=10)
+#moving widgets around to make the UI less cramped
+radio1.pack(pady=10, expand=True)
+radio2.pack(pady=10, expand=True)
+text_label.pack(pady=(20, 0), expand=True)
+text_entry.pack(pady=20, expand=True)
+submit_btn.pack(pady=10, expand=True)
 
-# Start the GUI event loop
+#start the GUI event loop
 root.mainloop()
