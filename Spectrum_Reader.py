@@ -4,14 +4,11 @@ import numpy as np
 
 from Spectrum_Creator import CreateSpec
 CreateSpec()
-from Spectrum_Creator import stype
-from Spectrum_Creator import targs
-from Spectrum_Creator import width
-from Spectrum_Creator import duration
+
+from Spectrum_Creator import stype, targs, width, duration
 
 
 samplingrate = 44100 # default for computer audio files
-# duration = 10 # in seconds
 lowerF, upperF = 428274940, 999308193.333333  # Lower and Upper bounds of the spectrum converted into frequencies
                                                # 300-700 nm wavelengths -> 428274940-999308193.333333 MHz frequencies
 
@@ -38,7 +35,7 @@ def NmToHz(ar):
         if ar[i] == 0:
             pass
         else:
-            freqAr.append((299792458000/ar[i])/(10**6) - 300)
+            freqAr.append((299792458/(ar[i]+300)/(10**3) - 300)) #we add the 300 back to the target to get it back into nm from pixels, then operate on it as a wavelength
     return freqAr
 
 def TargToFreqIndex(ar):
@@ -68,8 +65,8 @@ if stype == "Absorption":
     # and subtract by 300 to get these in an audible range.
     # Tweak this formula as needed
 
-    lowerF = (lowerF / 10**6) - 300   # 128.27 Hz for 300nm
-    upperF = (upperF / 10**6) - 300   # 699.3 Hz for 700nm
+    lowerF = (lowerF / 10**6) - 300   # 128.27 Hz for 700nm
+    upperF = (upperF / 10**6) - 300   # 699.3 Hz for 300nm
 
     # we need to create a sinusoidal wave function for the pitch
     # the wave function will look like y = Asin(2*pi*f*t). notice though that the frequency is a function of time
@@ -83,9 +80,9 @@ if stype == "Absorption":
     #it is important to measure from the start of the mute, that should be the exact wavelength that is missing
     for x in range(len(itargs)):
         for y in range(int(0.03 * samplingrate * duration)):    #this extends the mute artificially so you can hear the audio stop. remember, this audio has a refresh rate of 44100 per second, if only 1 sample is taken out, you wont hear that
-            if itargs[x]+y < len(sine_wave):
-                sine_wave[itargs[x] + y] = 0
-
+            if itargs[x]+y < len(sine_wave):                    #Feel free to tweak the y range depending on what resolution you need. this current iteration makes it such that every target lasts for 3% of the total runtime of the audio file
+                sine_wave[itargs[x] + y] = 0                    #That means that no matter the duration, if the targets are too close numerically, you'll never be able to hear the individual targets. to improve resolution, try using magic numbers
+                                                                #or a smaller percentage like 1% maybe 
 
 if stype == "Emission":
     #initialize our 0 volume template and convert our targets into frequencies that we can hear
@@ -96,7 +93,7 @@ if stype == "Emission":
     for x in range(len(itargs)):
         for y in range(int(0.03 * samplingrate * duration)):
             if itargs[x]+y < len(sine_wave):
-                sine_wave[itargs[x] + y] = np.sin(2 * np.pi * fTargs[x] * time[itargs[x] + y])
+                sine_wave[itargs[x] + y] = np.sin(2 * np.pi * fTargs[x] * time[itargs[x]+y])
 
 #---------------------CALCULATION TUTORIAL---------------------
 #To calculate wavelengths audibly, use a stopwatch beginning with the audio file, recording each stoppage time
