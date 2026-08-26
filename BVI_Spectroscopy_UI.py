@@ -3,6 +3,9 @@ from tkinter import messagebox
 from tkinter import ttk
 import sys
 from Element_Data import ELEMENT, ls_nm
+import os
+import winsound
+from PIL import Image, ImageTk
 
 #Global variables for use in Spectrum_Creator.py
 targs = []
@@ -81,7 +84,73 @@ def submit():
 
     #closes the window when user presses submit
     root.protocol("WM_DELETE_WINDOW", lambda: None)
-    root.destroy()
+
+    imgfile, wavfile = "Spectrum.png", "Spectrum_to_audio.wav"
+    root.withdraw()
+    open_player_ui(root, imgfile, wavfile)
+
+#global variable to track if the sound is currently playing (for use in open_player_ui functions)
+is_playing = False
+
+def open_player_ui(creatui, imgfile, wavfile):
+
+    #create a new window for the player UI
+    player_window = tk.Toplevel(creatui)
+    player_window.title("Spectrum & Audio Player")
+    player_window.geometry("600x400")
+    player_window.resizable(False, False)
+
+    #load and display the image
+    if os.path.exists(imgfile):
+        img = Image.open(imgfile)
+        img = img.resize((450, 80))
+        tk_im = ImageTk.PhotoImage(img) #convert to a format that tkinter can use and display, the png file data itself is useless for tkinter
+        img_label = tk.Label(player_window, image=tk_im) #creates the display for the image, think of it like a canvas that is set aside for the image
+        img_label.image = tk_im #creates a permanent copy of the image so python doesnt delete it when the function ends (wont display in that case)
+        img_label.pack(pady=10)
+    else:
+        messagebox.showerror("Error", "Image file 'Spectrum.png' not found.")
+        player_window.destroy()
+        return
+
+    #create a label so the user can tell if the audio is currently playing or not 
+    status_label = tk.Label(player_window, text="Audio Stopped", font=("Arial", 11), fg="gray")
+    status_label.pack(pady=5)
+
+    #functionality for the play button
+    def play_sound():
+        global is_playing
+        if os.path.exists(wavfile):
+            winsound.PlaySound(wavfile, winsound.SND_FILENAME | winsound.SND_ASYNC) #plays wavfile. snd_filename tells windows that the sound is a wav file. snd_async tells the player to allow the user to interface during the audio playback
+            is_playing = True
+            status_label.config(text="Playing", fg = "green") #this turns the play button into a stop button while the audio is playing
+    def stop_audio():
+            global is_playing
+            winsound.PlaySound(None, winsound.SND_PURGE) #none stops the audio playback. snd_purge tells windows to clear the audio "queue" which will otherwise lock your window so you cant exit
+            is_playing = False
+            status_label.config(text="Stopped", fg="black") #this turns the stop button back into a play button when the audio is stopped
+
+    def on_player_close():
+        stop_audio()
+        player_window.destroy()
+        root.destroy() #if the user closes the player window, we want to close the entire program, not just the player window
+        sys.exit(0) #this is just a failsafe to make sure the program closes if the user closes the player window
+                    #(sometimes the process doesnt end, even with root.destroy, not sure why)
+
+    btn_frame = tk.Frame(player_window)
+    btn_frame.pack(pady=10)
+
+    play_button = tk.Button(btn_frame, text="▶ Play", command=play_sound, font=("Arial", 12), width=10)
+    play_button.pack(side=tk.LEFT, padx=10)
+
+    #realistically, the stop button isnt necessary but if someone sets the duration high and doesn't want to listen
+    #to the entire audio, they can stop it early. Just a QOL feature
+    stop_button = tk.Button(btn_frame, text="⏸ Stop", command=stop_audio, font=("Arial", 12), width=10)
+    stop_button.pack(side=tk.LEFT, padx=10)
+
+    # Ensure audio stops if user closes the player window
+    player_window.protocol("WM_DELETE_WINDOW", on_player_close)
+
     
 def CreateUI():
     global radio_var, text_entry, spinbox_var, combo_var, root
