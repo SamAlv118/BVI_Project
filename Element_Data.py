@@ -1,8 +1,9 @@
-
-#this is the element dictionary
-#we can modify this to include 
-#only specific values if so desired
-#since larger atoms have more complex spectra
+#this is the element dictionary.
+#we can modify the lists to include 
+#only specific transition lines if so desired
+#since larger atoms have more complex spectra,
+#it might be worth it to sacrifice resolution 
+#in favor of more prominent transition lines.
 
 ELEMENT = {
     "Hydrogen": [410, 434, 486, 656],
