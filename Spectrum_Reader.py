@@ -8,6 +8,16 @@ SAMPLING_RATE = 44100 #default sampling rate for computer audio
 def CreateWav(stype, targs, duration):
     global WIDTH
     global SAMPLING_RATE
+
+    #-------IMPORTANT-------
+    #this variable determines how long you hear the audio cut or play for each absorption or emission line!
+    #if you want the audio cues to last the same amount of time regardless of audio file duration, change to
+    #a constant! 
+    #By default, i have it such that the cues take 3% of the total runtime of the audio file
+    #This cue duration is too long for lines that are close together like in sodium!!!!!
+    #a constant is better for the resolution of closer lines!
+    AUDIBLE_WIDTH_OF_LINE = 6000
+
     lowerF, upperF = 428274940, 999308193.333333  # Lower and Upper bounds of the spectrum converted into frequencies
                                                 # 300-700 nm wavelengths -> 428274940-999308193.333333 MHz frequencies
 
@@ -79,7 +89,7 @@ def CreateWav(stype, targs, duration):
         #this is going to locate the zeros in the wavelengths and mute the audio where each zero is located
         #it is important to measure from the start of the mute, that should be the exact wavelength that is missing
         for x in range(len(itargs)):
-            for y in range(int(0.03 * SAMPLING_RATE * duration)):    #this extends the mute artificially so you can hear the audio stop. remember, this audio has a refresh rate of 44100 per second, if only 1 sample is taken out, you wont hear that
+            for y in range(int(AUDIBLE_WIDTH_OF_LINE)):    #this extends the mute artificially so you can hear the audio stop. remember, this audio has a refresh rate of 44100 per second, if only 1 sample is taken out, you wont hear that
                 if itargs[x]+y < len(sine_wave):                    #Feel free to tweak the y range depending on what resolution you need. this current iteration makes it such that every target lasts for 3% of the total runtime of the audio file
                     sine_wave[itargs[x] + y] = 0                    #That means that no matter the duration, if the targets are too close numerically, you'll never be able to hear the individual targets. to improve resolution, try using magic numbers
                                                                     #or a smaller percentage like 1% maybe 
@@ -91,7 +101,7 @@ def CreateWav(stype, targs, duration):
 
         #this is going to use the index locations to create the pitch that you should hear at that location in a continuous spectrum
         for x in range(len(itargs)):
-            for y in range(int(0.03 * SAMPLING_RATE * duration)):
+            for y in range(int(AUDIBLE_WIDTH_OF_LINE)):
                 if itargs[x]+y < len(sine_wave):
                     sine_wave[itargs[x] + y] = np.sin(2 * np.pi * fTargs[x] * time[itargs[x]+y])
 

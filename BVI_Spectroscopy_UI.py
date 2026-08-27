@@ -312,7 +312,7 @@ def CreateUI():
 
     spinbox_label = tk.Label(spinbox_frame, text="Duration (sec)", font=("Arial", 13))
     spinbox_var = tk.StringVar(value="5")
-    spinbox = tk.Spinbox(spinbox_frame, from_ = 5, to = 60, textvariable=spinbox_var, width=5)
+    spinbox = tk.Spinbox(spinbox_frame, from_ = 5, to = 120, textvariable=spinbox_var, width=5)
 
     combo_label = tk.Label(root, text="Select a Preset Spectrum (optional): ", font=("Arial", 13))
     combo_var = tk.StringVar()
