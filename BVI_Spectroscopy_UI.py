@@ -1,11 +1,17 @@
+import sys
+import os
+import winsound
+
+from PIL import Image, ImageTk
+
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-import sys
+
 from Element_Data import ELEMENT, ls_nm
-import os
-import winsound
-from PIL import Image, ImageTk
+
+from Spectrum_Creator import CreateSpec
+from Spectrum_Reader import CreateWav
 
 #Global variables for use in Spectrum_Creator.py
 targs = []
@@ -78,6 +84,15 @@ def submit():
         return
 
 
+    try:
+        CreateSpec(stype, targs)
+        CreateWav(stype, targs, duration)
+
+    except Exception as e:
+        messagebox.showerror("Generation Error", f"Failed to generate output files:\n{e}")
+        return
+
+
     #display a confirmation screen on valid submission
     messagebox.showinfo("Submission Successful",
                         f"Selected Option: {selected_option}\nEntered Text: {sorted(targs)}")
@@ -85,6 +100,7 @@ def submit():
     #closes the window when user presses submit
     root.protocol("WM_DELETE_WINDOW", lambda: None)
 
+    #launches the player UI after pressing submit
     imgfile, wavfile = "Spectrum.png", "Spectrum_to_audio.wav"
     root.withdraw()
     open_player_ui(root, imgfile, wavfile)
@@ -211,4 +227,9 @@ def CreateUI():
     root.mainloop()
     
     return stype, targs, duration
+
+def main():
+    CreateUI()
+
+main()
 

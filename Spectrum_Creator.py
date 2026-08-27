@@ -1,16 +1,11 @@
 import png
 import numpy as np
 
-from BVI_Spectroscopy_UI import CreateUI
-
-stype = ''
-targs = []
 pixel_color = ()
-
 dec = np.linspace(255, 0, 80, dtype = int)  #we use spacing of 80 because we only have 400 total pixels to work with
 inc = np.linspace(0, 255, 80, dtype = int)  #combine this with the fact that there are 5 major color transitions, 400/5 = 80
 
-def CreateESpec():
+def CreateESpec(targs):
     global pixel_color
     #for pixels 0-80 (purple -> blue)
 
@@ -57,7 +52,7 @@ def CreateESpec():
             pixel_color = pixel_color + (0, 0, 0)
         
 
-def CreateASpec():
+def CreateASpec(targs):
     global pixel_color
     #for pixels 0-80 (purple -> blue)
 
@@ -104,28 +99,18 @@ def CreateASpec():
             pixel_color = pixel_color + (0, 0, 0)
 
 
-def CreateSpec():
-    #setting up all of the variables for the spectrum creator
-    global targs, stype
-    global dec
-    global inc
-    global pixel_color
-    global width
-    global duration
-
+def CreateSpec(stype, targs):
     width = 400 #each pixel is 1 nm in the range 300-700 nm
     height = 100 #this is just to give the spectrum more depth
     img = []
-    stype, targs, duration = CreateUI()
-    pixel_color = ()
     
     for i in range(len(targs)):
         targs[i] -= 300
 
     if stype == "Emission":
-        CreateESpec()
+        CreateESpec(targs)
     if stype == "Absorption":
-        CreateASpec()
+        CreateASpec(targs)
 
     #combine all the pixel_color tuples into a list containing 1 huge tuple with all the rgb codes  
     for i in range(height): 
