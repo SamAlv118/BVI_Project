@@ -27,8 +27,9 @@ lap_times = []
 
 #opens a player UI window for the user to interface with the audio playback and visible spectrum they just created
 #imgfile is unused here but I will leave functionality commented instead of deleted in case the professor wants to include the spectrum in the window
-def open_player_ui(imgfile, wavfile):
-
+# def open_player_ui(imgfile, wavfile):
+def open_player_ui():
+    
     #create a new window for the player UI
     player_window = tk.Tk()
     player_window.title("Spectrum & Audio Player")
@@ -55,7 +56,7 @@ def open_player_ui(imgfile, wavfile):
 
     #create a label so the user can tell if the audio is currently playing or not 
     status_label = tk.Label(player_window, text="Audio Stopped", font=("Arial", 11), fg="gray")
-    status_label.pack(pady=100)
+    status_label.pack(pady=40)
 
     def getDuration(path): 
         wav = wave.open(path, 'rb')
@@ -63,13 +64,13 @@ def open_player_ui(imgfile, wavfile):
         frame_rate = wav.getframerate()
         return total_frames/float(frame_rate)
 
-    duration = int(getDuration("Spectrum_to_audio.wav"))
 
     #functionality for the play button
     def play_sound():
         global is_playing, endtime, start_time, lap_times
-        if os.path.exists(wavfile):
+        if os.path.exists(radio_var.get()):
             #re-initialize all of the parameters that we use for tracking the audio playback features
+            wavfile = radio_var.get()
             stop_audio()  
             lap_times.clear() 
             start_time = time.time() 
@@ -80,7 +81,7 @@ def open_player_ui(imgfile, wavfile):
             play_button.config(text="⏸ Stop", command=stop_audio)  #this turns the play button into a stop button while the audio is playing
 
             ###BVI ACCESSIBILITY FEATURE###
-            player_window.bind('<space>', lambda event: stop_audio())  #rebinds the spacebar to the stop button, so the user can press space to stop the audio
+            # player_window.bind('<space>', lambda event: stop_audio())  #rebinds the spacebar to the stop button, so the user can press space to stop the audio
 
             #tkinter likes milliseconds for the "after" function parameter
             ms = duration * 1000
@@ -104,7 +105,7 @@ def open_player_ui(imgfile, wavfile):
         play_button.config(text="▶ Play", command=play_sound)  #this turns the stop button back into a play button when the audio is stopped
 
         ###BVI ACCESSIBILITY FEATURE###
-        player_window.bind('<space>', lambda event: play_sound())  #rebinds the spacebar to the play button after the audio is stopped
+        # player_window.bind('<space>', lambda event: play_sound())  #rebinds the spacebar to the play button after the audio is stopped
 
 
     #functionality for the lap button (important for calculating specific emission/absorption lines)
@@ -165,27 +166,43 @@ def open_player_ui(imgfile, wavfile):
         time_window.bind('<Escape>', lambda event: close_time_ui())
 
 
+    radio_frame = tk.Frame(player_window)
+    radio_frame.pack(pady=0)
+
+    global radio_var
+    radio_var = tk.StringVar(value = False)
+
+    radio1 = tk.Radiobutton(radio_frame, text="Element 1", variable=radio_var, value="Spectrum_to_audio.wav", font = ("Arial", 13))
+    radio2 = tk.Radiobutton(radio_frame, text="Element 2", variable=radio_var, value="Spectrum_to_audio2.wav", font = ("Arial", 13))
+    radio3 = tk.Radiobutton(radio_frame, text="Element 3", variable=radio_var, value="Spectrum_to_audio3.wav", font = ("Arial", 13))
+    radio4 = tk.Radiobutton(radio_frame, text="Element 4", variable=radio_var, value="Spectrum_to_audio4.wav", font = ("Arial", 13))
+    radio1.pack(side="left", padx=5)
+    radio2.pack(side="left", padx=5)
+    radio3.pack(side="left", padx=5)
+    radio4.pack(side="left", padx=5)
+
+    radio_var.set("Spectrum_to_audio.wav")
+    duration = int(getDuration(radio_var.get())) #This has to be down here because otherwise, the .get() method will not work
+
     btn_frame = tk.Frame(player_window)
     btn_frame.pack(pady=0)
 
     play_button = tk.Button(btn_frame, text="▶ Play", command=play_sound, font=("Arial", 13), width=10)
-    play_button.pack(side=tk.LEFT, padx=10)
-
-    ###BVI ACCESSIBILITY FEATURE###
-    player_window.bind('<space>', lambda event: play_sound()) 
+    play_button.pack(side="left", padx=10, pady=20)
+ 
 
     lap_button = tk.Button(btn_frame, text="⏱ Lap", command=lap, font=("Arial", 13), width=10)
-    lap_button.pack(side=tk.LEFT, padx=10)
+    lap_button.pack(side="left", padx=10, pady=20)
 
     timeui_button = tk.Button(btn_frame, text="View Laps", command=lambda: open_time_ui(player_window, lap_times), font=("Arial", 13), width=10)
-    timeui_button.pack(side=tk.LEFT, padx=10)
+    timeui_button.pack(side="left", padx=10, pady=20)
 
 
     ###BVI ACCESSIBILITY FEATURE###
-    player_window.bind('<Return>', lambda event: open_time_ui(player_window, lap_times))
+    #player_window.bind('<Return>', lambda event: open_time_ui(player_window, lap_times))
 
-    player_window.bind('<Z>', lambda event: lap())
-    player_window.bind('<z>', lambda event: lap())
+    # player_window.bind('<Z>', lambda event: lap())
+    # player_window.bind('<z>', lambda event: lap())
 
 
 
@@ -204,9 +221,9 @@ def open_player_ui(imgfile, wavfile):
 
 
 def main():
-    #launches the player UI after pressing submit
-    imgfile, wavfile = "Spectrum.png", "Spectrum_to_audio.wav"
-    open_player_ui(imgfile, wavfile)
+    # imgfile, wavfile = "Spectrum.png", "Spectrum_to_audio.wav"
+    # open_player_ui(imgfile, wavfile)
+    open_player_ui()
 
 main()
 
